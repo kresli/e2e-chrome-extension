@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "cp public/manifest.json dist/manifest.json && parcel watch src/*.html"
+    "start": "cp -r public/. dist && parcel watch src/*.html"
   },
   "dependencies": {
     "@types/chrome": "^0.0.91",
