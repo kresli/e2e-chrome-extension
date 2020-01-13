@@ -11,11 +11,10 @@
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["content/index.ts"]
+      "js": ["content/index.ts"],
+      "run_at": "document_start"
     }
   ],
-  "web_accessible_resources": [
-    "devtools/panel.html"
-  ],
+  "web_accessible_resources": ["devtools/panel.html"],
   "permissions": ["tabs", "http://*/*", "https://*/*"]
 }
