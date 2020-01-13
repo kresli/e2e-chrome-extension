@@ -1,8 +1,7 @@
-console.log("hello from devtools");
 chrome.devtools.panels.create(
-  "ColdFire",
+  "E2E",
   "coldfusion10.png",
-  "panel.html",
+  "devtools/panel.html",
   function(panel) {
     console.log("hello from callback");
   }

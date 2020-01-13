@@ -4,8 +4,10 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
+    "clean": "rm -rf dist",
     "watch": "node scripts/no-hash-background.js",
-    "start": "rm -rf dist; cpx public/* dist -w & yarn watch & parcel watch src/**/*.html"
+    "hola": "yarn watch",
+    "start": "parcel src/manifest.json"
   },
   "dependencies": {
     "@types/chrome": "^0.0.91",
@@ -19,7 +21,9 @@
     "react-dom": "^16.12.0"
   },
   "devDependencies": {
+    "concurrently": "^5.0.2",
     "cpx": "^1.5.0",
+    "parcel-plugin-web-extension": "git+https://github.com/kresli/parcel-plugin-web-extension.git",
     "typescript": "^3.7.4"
   }
 }
