@@ -16,5 +16,5 @@
     }
   ],
   "web_accessible_resources": ["devtools/panel.html"],
-  "permissions": ["tabs", "<all_urls>"]
+  "permissions": ["tabs", "<all_urls>", "debugger"]
 }

@@ -1,72 +1,91 @@
-import { ContentPortName } from "~/content/content";
-import { PopupPortName } from "~/popup/popup";
-import { Action } from "~/actions";
-
-const _messagesCallbacks = new Map<Action, Set<(message: Message) => void>>();
-
-interface Message {
-  action: Action;
+import { RecipeAction, PortName } from "~/actions";
+import { Recipe, BridgePort, PortListener } from "~/components";
+import Dexie from "dexie";
+import "babel-polyfill";
+interface Record {
+  timeStamp: number;
+  path: string;
 }
 
-interface Ports {
-  content: chrome.runtime.Port | null;
-  popup: chrome.runtime.Port | null;
-  // devtools: chrome.runtime.Port | null;
+class DB extends Dexie {
+  public records: Dexie.Table<Record, number>;
+  constructor() {
+    super("DB");
+    this.version(1).stores({
+      records: "timeStamp,path"
+    });
+  }
 }
 
-interface Config {
-  port: string;
-  action: Action;
-}
+const db = new DB();
 
-function onMessage(action: Action) {
-  return function(
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor
-  ) {
-    const set = _messagesCallbacks.get(action) || new Set();
-    set.add(descriptor.value);
-    _messagesCallbacks.set(action, set);
-  };
-}
+// db.transaction("rw", db.records, async () => {
+//   // // Make sure we have something in DB:
+//   // if ((await db.friends.where('name').equals('Josephine').count()) === 0) {
+//   //     let id = await db.friends.add({name: "Josephine", age: 21});
+//   //     alert (`Addded friend with id ${id}`);
+//   // }
+
+//   // Query:
+//   let youngFriends = await db.friends
+//     .where("age")
+//     .below(25)
+//     .toArray();
+
+//   // Show result:
+//   alert("My young friends: " + JSON.stringify(youngFriends));
+// }).catch(e => {
+//   alert(e.stack || e);
+// });
 
 class Bridge {
-  private ports: Ports = {
-    content: null,
-    popup: null
-    // devtools: null
-  };
+  protected ports = new Map<PortName, BridgePort>();
+  private allListeners: Set<PortListener> = new Set();
   constructor() {
     chrome.runtime.onConnect.addListener(port => {
       this.setPort(port);
     });
   }
   private setPort(port: chrome.runtime.Port) {
-    switch (port.name) {
-      case ContentPortName: {
-        this.ports.content = port;
-        port.onDisconnect.addListener(() => (this.ports.content = null));
-        break;
-      }
-      case PopupPortName: {
-        this.ports.popup = port;
-        port.onDisconnect.addListener(() => (this.ports.popup = null));
-        break;
-      }
-      default:
-        throw new Error(`${port.name} is not registered port`);
-    }
-    port.onMessage.addListener((message: Message) => {
-      const messages = _messagesCallbacks.get(message.action);
-      if (!messages) return;
-      messages.forEach(cb => cb(message));
-    });
+    const portName = port.name as PortName;
+    if (!Object.values(PortName).includes(portName as PortName))
+      throw new Error(`${portName} is not registered port`);
+    this.ports.set(
+      portName,
+      new BridgePort({
+        port,
+        onDisconnect: () => this.ports.delete(portName)
+      })
+    );
+    this.ports.get(portName)?.setListeners([...this.allListeners]);
   }
-  @onMessage(Action.START_RECORDING)
-  doSomething(message: Message) {
-    console.log("action!!!");
+
+  protected registerListener(listener: (recipe: Recipe) => void) {
+    this.allListeners.add((recipe: Recipe) => listener(recipe));
+    this.ports.forEach(port => port.setListeners([...this.allListeners]));
   }
 }
 
-const bridge = new Bridge();
+class Background extends Bridge {
+  constructor() {
+    super();
+    this.registerListener(this.delegate.bind(this));
+    this.registerListener(this.onAddRecord.bind(this));
+  }
+
+  private delegate(recipe: Recipe) {
+    this.ports.forEach(port => port.postRecipe(recipe));
+  }
+
+  private onAddRecord(recipe: Recipe) {
+    if (recipe.action !== RecipeAction.ADD_RECORD) return;
+    console.log("1. onAddRecord");
+    db.transaction("rw", db.records, async () => {
+      console.log("2. transaction");
+      let id = await db.records.add(recipe.message);
+      alert(`Addded friend with id ${id}`);
+    });
+  }
+}
+
+new Background();

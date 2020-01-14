@@ -7,10 +7,15 @@
     "start": "parcel src/manifest.json --no-hmr"
   },
   "dependencies": {
+    "@babel/polyfill": "^7.8.3",
     "@types/chrome": "^0.0.91",
+    "@types/jquery": "^3.3.31",
     "@types/react": "^16.9.17",
     "@types/react-dom": "^16.9.4",
+    "babel-polyfill": "^6.26.0",
     "chokidar": "^3.3.1",
+    "dexie": "^2.0.4",
+    "jquery": "^3.4.1",
     "mobx": "^5.15.1",
     "mobx-react": "^6.1.4",
     "parcel-bundler": "^1.12.4",

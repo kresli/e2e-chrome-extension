@@ -1,37 +1,32 @@
 import React from "react";
 import { observer } from "mobx-react";
 import { observable, action } from "mobx";
-import { Action } from "~/actions";
-
-export const PopupPortName = "popup-port";
+import { RecipeAction, PortName } from "~/actions";
 
 @observer
 export class Popup extends React.Component {
   @observable isRecording = false;
-  port = chrome.runtime.connect({ name: PopupPortName });
+  port = chrome.runtime.connect({ name: PortName.POPUP });
   private setIsRecording = action((isRecording: boolean) => () => {
     this.isRecording = isRecording;
-    this.port.postMessage({ action: Action.STOP_RECORDING });
+    const action = isRecording
+      ? RecipeAction.START_RECORDING
+      : RecipeAction.STOP_RECORDING;
+    this.port.postMessage({ action });
   });
   render() {
     return (
       <div>
-        {!this.isRecording && (
-          <button
-            onClick={this.setIsRecording(true)}
-            style={{ fontSize: "2em" }}
-          >
-            start
-          </button>
-        )}
-        {this.isRecording && (
-          <button
-            onClick={this.setIsRecording(false)}
-            style={{ fontSize: "2em" }}
-          >
-            stop
-          </button>
-        )}
+        <button onClick={this.setIsRecording(true)} style={{ fontSize: "2em" }}>
+          start
+        </button>
+
+        <button
+          onClick={this.setIsRecording(false)}
+          style={{ fontSize: "2em" }}
+        >
+          stop
+        </button>
       </div>
     );
   }
