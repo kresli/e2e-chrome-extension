@@ -3,18 +3,18 @@
   "version": "1.0.2",
   "manifest_version": 2,
   "description": "",
-  "devtools_page": "devtools/index.html",
-  "background": { "scripts": ["background/index.ts"] },
+  "devtools_page": "devtools/devtools.html",
+  "background": { "scripts": ["background/background.ts"] },
   "browser_action": {
-    "default_popup": "popup/index.html"
+    "default_popup": "popup/popup.html"
   },
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["content/index.ts"],
+      "js": ["content/content.ts"],
       "run_at": "document_start"
     }
   ],
   "web_accessible_resources": ["devtools/panel.html"],
-  "permissions": ["tabs", "http://*/*", "https://*/*"]
+  "permissions": ["tabs", "<all_urls>"]
 }

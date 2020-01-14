@@ -4,10 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "clean": "rm -rf dist",
-    "watch": "node scripts/no-hash-background.js",
-    "hola": "yarn watch",
-    "start": "parcel src/manifest.json"
+    "start": "parcel src/manifest.json --no-hmr"
   },
   "dependencies": {
     "@types/chrome": "^0.0.91",

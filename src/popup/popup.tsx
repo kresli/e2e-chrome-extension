@@ -1,17 +1,22 @@
 import React from "react";
 import { observer } from "mobx-react";
 import { observable, action } from "mobx";
-import { PopupBridge } from "~/popup/popup.bridge";
+import { Action } from "~/actions";
+
+export const PopupPortName = "popup-port";
+
 @observer
 export class Popup extends React.Component {
-  private bridge = new PopupBridge();
-  private setIsRecording = (isRecording: boolean) => () =>
-    this.bridge.setIsRecording(isRecording);
+  @observable isRecording = false;
+  port = chrome.runtime.connect({ name: PopupPortName });
+  private setIsRecording = action((isRecording: boolean) => () => {
+    this.isRecording = isRecording;
+    this.port.postMessage({ action: Action.STOP_RECORDING });
+  });
   render() {
-    if (!this.bridge) return <div>Loading...</div>;
     return (
       <div>
-        {!this.bridge.isRecording && (
+        {!this.isRecording && (
           <button
             onClick={this.setIsRecording(true)}
             style={{ fontSize: "2em" }}
@@ -19,7 +24,7 @@ export class Popup extends React.Component {
             start
           </button>
         )}
-        {this.bridge.isRecording && (
+        {this.isRecording && (
           <button
             onClick={this.setIsRecording(false)}
             style={{ fontSize: "2em" }}
