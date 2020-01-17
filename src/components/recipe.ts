@@ -15,7 +15,7 @@ export class Recipe<C extends Config = Config> {
 }
 
 export class RecipeAddRecord extends Recipe {
-  constructor(message: { path: string; timeStamp: number }) {
+  constructor(message: { path: string; timeStamp: number; url: string }) {
     super({
       action: RecipeAction.ADD_RECORD,
       message: message

@@ -66,12 +66,16 @@ class Content {
   private onEvent: [string, (ev: QMouseEvent) => void] = [
     "click",
     ({ target, currentTarget, timeStamp }: QMouseEvent) => {
+      console.log("click");
       if (target !== currentTarget || !this.isRecording) return;
       const path = generateSelector(target);
-      this.port.postRecipe(new RecipeAddRecord({ path, timeStamp }));
+      this.port.postRecipe(
+        new RecipeAddRecord({ path, timeStamp, url: window.location.href })
+      );
     }
   ];
   private onStartRecording(recipe: Recipe) {
+    console.log("received ", recipe);
     if (recipe.action !== RecipeAction.START_RECORDING) return;
     this.isRecording = true;
     this.observer.observe(document, {

@@ -12,6 +12,7 @@ export class Popup extends React.Component {
     const action = isRecording
       ? RecipeAction.START_RECORDING
       : RecipeAction.STOP_RECORDING;
+    console.log("post");
     this.port.postMessage({ action });
   });
   render() {

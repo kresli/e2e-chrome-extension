@@ -1,6 +1,6 @@
 export enum PortName {
-  CONTENT = 'CONTENT';
-  POPUP = 'POPUP'
+  CONTENT = "CONTENT",
+  POPUP = "POPUP"
 }
 
 export enum RecipeAction {
